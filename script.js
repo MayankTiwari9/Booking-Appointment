@@ -13,6 +13,7 @@ form.addEventListener('submit', function(e){
         number: number
     };
     saveFormData(formData);
+    location.reload();
 });
 
 const storedData = JSON.parse(localStorage.getItem('formData')) || [];
