@@ -25,11 +25,26 @@ function saveFormData(formData){
 }
 
 let list = document.getElementById('users');
-storedData.forEach(element => {
-    let listitem = document.createElement('li');
-    listitem.textContent = element.name + '-' + element.email + '-' + element.number;
-    list.appendChild(listitem);
-});
+function displayStoredData() {
+    list.innerHTML = '';
 
+    storedData.forEach((element, index) => {
+        let listitem = document.createElement('li');
+        listitem.textContent = element.name + '-' + element.email + '-' + element.number;
+        
+        let delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.type = 'button';
+        delBtn.addEventListener('click', function() {
+            storedData.splice(index, 1);
+            localStorage.setItem('formData', JSON.stringify(storedData));
 
+            displayStoredData();
+        });
 
+        listitem.appendChild(delBtn);
+        list.appendChild(listitem);
+    });
+}
+
+displayStoredData();
