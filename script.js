@@ -31,6 +31,8 @@ function displayStoredData() {
     list.innerHTML = '';
 
     storedData.forEach((element, index) => {
+
+        //Showing data on UI
         let listitem = document.createElement('li');
         listitem.textContent = element.name + '-' + element.email + '-' + element.number;
         
@@ -71,4 +73,5 @@ function displayStoredData() {
     });
 }
 
+//Displaying data to UI
 displayStoredData();
