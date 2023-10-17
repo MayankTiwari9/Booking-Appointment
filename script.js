@@ -1,55 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-
-
+    
+    
     const form = document.getElementById('my-form');
-
+    
+    const list = document.getElementById('users');
     let storedData = [];
 
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const number = document.getElementById('number').value;
-
-        const formData = {
-            name: name,
-            email: email,
-            number: number
-        };
-
-
-
-        saveFormData(formData);
-        // location.reload();
-
-
-    });
-    
-
-    //Saving in local storage
-    // const storedData = JSON.parse(localStorage.getItem('formData')) || [];
-    function saveFormData(formData) {
-
-        storedData.push(formData);
-
-        axios.post("https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns", formData)
-            .then((res) => {
-                const data = res.data;
-                displayStoredData(data);
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-
-        //     // localStorage.setItem('formData', JSON.stringify(storedData));
-
-    }
-
-
-
     function displayStoredData() {
-        const list = document.getElementById('users');
         list.innerHTML = '';
 
         storedData.forEach((element, index) => {
@@ -62,11 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
             let delBtn = document.createElement('button');
             delBtn.textContent = 'Delete';
             delBtn.type = 'button';
-            delBtn.addEventListener('click', function () {
-                storedData.splice(index, 1);
-                localStorage.setItem('formData', JSON.stringify(storedData));
-
-                displayStoredData();
+            delBtn.addEventListener('click', () => {
+                deleteUserData(element._id);
             });
 
             // Edit functionality
@@ -95,10 +49,68 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function deleteUserData(userId) {
+        axios
+            .delete(`https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns/${userId}`)
+            .then(() => {
+                // Remove the deleted user detail from the storedData array
+                storedData = storedData.filter((user) => user._id !== userId);
+
+                // Update the displayed user data
+                displayStoredData();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const number = document.getElementById('number').value;
+
+        const formData = {
+            name: name,
+            email: email,
+            number: number
+        };
+
+
+
+        saveFormData(formData);
+
+
+    });
+    
+
+    //Saving in local storage
+    // const storedData = JSON.parse(localStorage.getItem('formData')) || [];
+    function saveFormData(formData) {
+
+        
+        axios.post("https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns", formData)
+        .then((res) => {
+            const data = res.data;
+            storedData.push(formData);
+                displayStoredData(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+
+        //     // localStorage.setItem('formData', JSON.stringify(storedData));
+
+    }
+
+
+
+    
+
     axios.get('https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns')
         .then((res) => {
             storedData = res.data;
-            console.log(res.data);
             displayStoredData(storedData)
         })
         .catch((err) => console.log(err))
