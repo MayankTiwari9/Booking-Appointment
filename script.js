@@ -13,24 +13,41 @@ form.addEventListener('submit', function(e){
         number: number
     };
 
-    saveFormData(formData);
-    location.reload();
+    axios.post("https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns", formData)
+    .then((res) => {
+        const data = res.data;
+        displayStoredData(data);
+        // console.log(data)
+    })
+    .catch((err) => {
+        console.log(err)
+    }) 
+
+    
+
+    
+
+    // saveFormData(formData);
+    // location.reload();
+
+     
 });
 
 //Saving in local storage
 const storedData = JSON.parse(localStorage.getItem('formData')) || [];
-function saveFormData(formData){
+// function saveFormData(formData){
 
-    storedData.push(formData);
+//     storedData.push(formData);
 
-    localStorage.setItem('formData', JSON.stringify(storedData));
-}
+//     // localStorage.setItem('formData', JSON.stringify(storedData));
+    
+// }
 
 let list = document.getElementById('users');
-function displayStoredData() {
+function displayStoredData(element) {
     list.innerHTML = '';
 
-    storedData.forEach((element, index) => {
+    // storedData.forEach((element, index) => {
 
         //Showing data on UI
         let listitem = document.createElement('li');
@@ -70,7 +87,7 @@ function displayStoredData() {
         listitem.appendChild(delBtn);
         listitem.appendChild(editBtn);
         list.appendChild(listitem);
-    });
+    // });
 }
 
 //Displaying data to UI
