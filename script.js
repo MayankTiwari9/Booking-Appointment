@@ -37,8 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 numberInput.value = element.number;
 
                 storedData.splice(index, 1);
-                localStorage.setItem('formData', JSON.stringify(storedData));
-
+                
+                updateUserData(element);
+                
                 displayStoredData();
             })
 
@@ -47,6 +48,17 @@ document.addEventListener("DOMContentLoaded", () => {
             listitem.appendChild(editBtn);
             list.appendChild(listitem);
         });
+    }
+
+    function updateUserData(user) {
+        axios
+            .put(`https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns/${user._id}`, user)
+            .then(() => {
+                displayStoredData();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 
     function deleteUserData(userId) {
