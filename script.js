@@ -1,94 +1,109 @@
-let form = document.getElementById('my-form');
+document.addEventListener("DOMContentLoaded", () => {
 
-form.addEventListener('submit', function(e){
-    e.preventDefault();
 
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const number = document.getElementById('number').value;
+    const form = document.getElementById('my-form');
 
-    const formData = {
-        name: name,
-        email: email,
-        number: number
-    };
+    let storedData = [];
 
-    axios.post("https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns", formData)
-    .then((res) => {
-        const data = res.data;
-        displayStoredData(data);
-        // console.log(data)
-    })
-    .catch((err) => {
-        console.log(err)
-    }) 
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
 
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const number = document.getElementById('number').value;
+
+        const formData = {
+            name: name,
+            email: email,
+            number: number
+        };
+
+
+
+        saveFormData(formData);
+        // location.reload();
+
+
+    });
     
 
-    
+    //Saving in local storage
+    // const storedData = JSON.parse(localStorage.getItem('formData')) || [];
+    function saveFormData(formData) {
 
-    // saveFormData(formData);
-    // location.reload();
+        storedData.push(formData);
 
-     
-});
+        axios.post("https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns", formData)
+            .then((res) => {
+                const data = res.data;
+                displayStoredData(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            })
 
-//Saving in local storage
-const storedData = JSON.parse(localStorage.getItem('formData')) || [];
-// function saveFormData(formData){
+        //     // localStorage.setItem('formData', JSON.stringify(storedData));
 
-//     storedData.push(formData);
+    }
 
-//     // localStorage.setItem('formData', JSON.stringify(storedData));
-    
-// }
 
-let list = document.getElementById('users');
-function displayStoredData(element) {
-    list.innerHTML = '';
 
-    // storedData.forEach((element, index) => {
+    function displayStoredData() {
+        const list = document.getElementById('users');
+        list.innerHTML = '';
 
-        //Showing data on UI
-        let listitem = document.createElement('li');
-        listitem.textContent = element.name + '-' + element.email + '-' + element.number;
-        
-        // Delete Functionality
-        let delBtn = document.createElement('button');
-        delBtn.textContent = 'Delete';
-        delBtn.type = 'button';
-        delBtn.addEventListener('click', function() {
-            storedData.splice(index, 1);
-            localStorage.setItem('formData', JSON.stringify(storedData));
+        storedData.forEach((element, index) => {
 
-            displayStoredData();
+            //Showing data on UI
+            let listitem = document.createElement('li');
+            listitem.textContent = element.name + '-' + element.email + '-' + element.number;
+
+            // Delete Functionality
+            let delBtn = document.createElement('button');
+            delBtn.textContent = 'Delete';
+            delBtn.type = 'button';
+            delBtn.addEventListener('click', function () {
+                storedData.splice(index, 1);
+                localStorage.setItem('formData', JSON.stringify(storedData));
+
+                displayStoredData();
+            });
+
+            // Edit functionality
+            let editBtn = document.createElement('button');
+            editBtn.textContent = 'Edit';
+            editBtn.type = 'button';
+            editBtn.addEventListener('click', function () {
+
+                let nameInput = document.getElementById('name');
+                nameInput.value = element.name;
+                let emailInput = document.getElementById('email');
+                emailInput.value = element.email;
+                let numberInput = document.getElementById('number');
+                numberInput.value = element.number;
+
+                storedData.splice(index, 1);
+                localStorage.setItem('formData', JSON.stringify(storedData));
+
+                displayStoredData();
+            })
+
+            // Appending delete and edit to li and li to ul
+            listitem.appendChild(delBtn);
+            listitem.appendChild(editBtn);
+            list.appendChild(listitem);
         });
+    }
 
-        // Edit functionality
-        let editBtn = document.createElement('button');
-        editBtn.textContent = 'Edit';
-        editBtn.type = 'button';
-        editBtn.addEventListener('click', function(){
-
-            let nameInput = document.getElementById('name');
-            nameInput.value = element.name;
-            let emailInput = document.getElementById('email');
-            emailInput.value = element.email;
-            let numberInput = document.getElementById('number');
-            numberInput.value = element.number;
-
-            storedData.splice(index, 1);
-            localStorage.setItem('formData', JSON.stringify(storedData));
-
-            displayStoredData();
+    axios.get('https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns')
+        .then((res) => {
+            storedData = res.data;
+            console.log(res.data);
+            displayStoredData(storedData)
         })
+        .catch((err) => console.log(err))
 
-        // Appending delete and edit to li and li to ul
-        listitem.appendChild(delBtn);
-        listitem.appendChild(editBtn);
-        list.appendChild(listitem);
-    // });
-}
+    //Displaying data to UI
+    displayStoredData();
 
-//Displaying data to UI
-displayStoredData();
+})
