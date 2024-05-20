@@ -1,133 +1,77 @@
 document.addEventListener("DOMContentLoaded", () => {
-    
-    
-    const form = document.getElementById('my-form');
-    
-    const list = document.getElementById('users');
+    const form = document.getElementById("my-form");
+    const list = document.getElementById("users");
     let storedData = [];
-
-    function displayStoredData() {
-        list.innerHTML = '';
-
-        storedData.forEach((element, index) => {
-
-            //Showing data on UI
-            let listitem = document.createElement('li');
-            listitem.textContent = element.name + '-' + element.email + '-' + element.number;
-
-            // Delete Functionality
-            let delBtn = document.createElement('button');
-            delBtn.textContent = 'Delete';
-            delBtn.type = 'button';
-            delBtn.addEventListener('click', () => {
-                deleteUserData(element._id);
-            });
-
-            // Edit functionality
-            let editBtn = document.createElement('button');
-            editBtn.textContent = 'Edit';
-            editBtn.type = 'button';
-            editBtn.addEventListener('click', function () {
-
-                let nameInput = document.getElementById('name');
-                nameInput.value = element.name;
-                let emailInput = document.getElementById('email');
-                emailInput.value = element.email;
-                let numberInput = document.getElementById('number');
-                numberInput.value = element.number;
-
-                storedData.splice(index, 1);
-                
-                updateUserData(element);
-                
-                displayStoredData();
-            })
-
-            // Appending delete and edit to li and li to ul
-            listitem.appendChild(delBtn);
-            listitem.appendChild(editBtn);
-            list.appendChild(listitem);
+  
+    function displayStoredData(data) {
+      list.innerHTML = "";
+      data.forEach((element, index) => {
+        let listitem = document.createElement("li");
+        listitem.textContent = `${element.name} - ${element.email} - ${element.number}`;
+  
+        let delBtn = document.createElement("button");
+        delBtn.textContent = "Delete";
+        delBtn.type = "button";
+        delBtn.addEventListener("click", () => deleteUserData(element.id, index));
+  
+        let editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.type = "button";
+        editBtn.addEventListener("click", () => {
+          document.getElementById("name").value = element.name;
+          document.getElementById("email").value = element.email;
+          document.getElementById("number").value = element.number;
+          storedData.splice(index, 1);
+          updateUserData(element);
+          displayStoredData(storedData);
         });
+  
+        listitem.appendChild(delBtn);
+        listitem.appendChild(editBtn);
+        list.appendChild(listitem);
+      });
     }
-
+  
     function updateUserData(user) {
-        axios
-            .put(`https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns/${user._id}`, user)
-            .then(() => {
-                displayStoredData();
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+      axios.put(`https://crudcrud.com/api/ddcfc201340b49b3948b1f6c2dc01d5e/unicorns/${user.id}`, user)
+        .then(() => displayStoredData(storedData))
+        .catch(err => console.log(err));
     }
-
-    function deleteUserData(userId) {
-        axios
-            .delete(`https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns/${userId}`)
-            .then(() => {
-                // Remove the deleted user detail from the storedData array
-                storedData = storedData.filter((user) => user._id !== userId);
-
-                // Update the displayed user data
-                displayStoredData();
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const number = document.getElementById('number').value;
-
-        const formData = {
-            name: name,
-            email: email,
-            number: number
-        };
-
-
-
-        saveFormData(formData);
-
-
-    });
-    
-
-    //Saving in local storage
-    // const storedData = JSON.parse(localStorage.getItem('formData')) || [];
-    function saveFormData(formData) {
-
-        
-        axios.post("https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns", formData)
-        .then((res) => {
-            const data = res.data;
-            storedData.push(formData);
-                displayStoredData(data);
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-
-        //     // localStorage.setItem('formData', JSON.stringify(storedData));
-
-    }
-
-
-
-    
-
-    axios.get('https://crudcrud.com/api/cc870a2286724de3a782d6b4fe6bf98d/unicorns')
-        .then((res) => {
-            storedData = res.data;
-            displayStoredData(storedData)
+  
+    function deleteUserData(id, index) {
+      axios.post(`http://localhost:4000/admin/delete-user`, {id})
+        .then(() => {
+            storedData.splice(index, 1);
+          displayStoredData(storedData);
         })
-        .catch((err) => console.log(err))
+        .catch(err => console.log(err));
+    }
 
-    //Displaying data to UI
-    displayStoredData();
-
-})
+    console.log(storedData);
+  
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const number = document.getElementById("number").value;
+      const formData = { name, email, number };
+      axios.post("http://localhost:4000/admin/add-user", formData)
+        .then(res => {
+          storedData.push(res.data.user);
+          displayStoredData(storedData);
+        })
+        .catch(err => console.log(err));
+    });
+  
+    function fetchUsers() {
+      axios.get("http://localhost:4000/admin/users")
+        .then(res => {
+          storedData = res.data;
+          displayStoredData(storedData);
+        })
+        .catch(err => console.log(err));
+    }
+  
+    fetchUsers(); // Fetch users when the page loads
+  });
+  
